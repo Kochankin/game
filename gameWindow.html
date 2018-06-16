@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+
+	<!-- META -->
+	<meta charset="UTF-8">
+	<title>Magic Journey</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- SEO-->
+	<meta name="Description" content="Help Katy to fight against angry monsters. Learn math and Russian while playing.">
+	<meta name="Rating" content="general">
+	<meta name="Author" content="Kochankin Production">
+	<meta name="Robots" content="index,follow">
+
+	<!-- CONFIG-->
+	<meta name="format-detection" content="telephone=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<!--FONTS-->
+  <link href="https://fonts.googleapis.com/css?family=Amatic+SC:400,700&amp;subset=cyrillic" rel="stylesheet">
+
+	<!--CSS--> 
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+	<link rel="stylesheet" href="css/main.css">
+
+</head>
+<body>
+  <div class="container">
+    <section class="top">
+       <section class="user-board board"> 
+        <div class="name">  </div> 
+        <div class="health"> 
+          <div></div>
+          <span></span>
+        </div> 
+      </section>
+
+      <div class="level"> LEVEL <span></span> </div>
+   
+      <section class="monster-board board">
+          <div class="name"> </div>
+          <div class="health">  
+              <div></div>
+              <span></span>
+          </div> 
+      </section>
+    </section>
+   
+    <section class="spells-board">
+      <div class="spell fire-spell"> </div><span class="fire-spell">Огненный шар</span>
+      <div class="spell arrow-spell">  </div><span class="arrow-spell">Стрела поражения</span>
+      <div class="spell freeze-spell"></div>  <span class="freeze-spell">Ледяной шар</span>
+      <div class="spell lightning-spell"> </div> <span class="lightning-spell">Небесная кара</span>
+      <div class="spell poison-spell"> </div><span class="poison-spell">Проклинающее зелье</span> 
+      <div class="spell rain-spell"> </div> <span class="rain-spell">Ливень остолбенения</span>
+    </section>
+
+    <section class="bottom">
+      <a class="exit-button" title="Выйти из игры" href="index.html"></a>
+    </section>
+
+    <canvas id="katy"> 
+    К сожалению, ваш браузер не поддерживает технологию canvas
+    </canvas> 
+
+    <canvas id="monster" width="300" height="300" > 
+    К сожалению, ваш браузер не поддерживает технологию canvas
+    </canvas>
+    
+  </div>
+
+  <section class="task-window">
+    <div class="task-wrapper">
+      <button class="close-button"></button>
+    </div>
+  </section>
+
+  <audio class="main-audio"  src="audio/main.ogg" type="audio/ogg; codecs=vorbis" autoplay loop ></audio>
+  <audio class="battle-audio"  src="audio/battle.ogg" type="audio/ogg; codecs=vorbis" autoplay loop ></audio>
+  <audio class="results-audio"  src="audio/results.ogg" type="audio/ogg; codecs=vorbis" autoplay loop ></audio>
+  <audio class="click-audio"  src="audio/click.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="shoot-audio"  src="audio/shoot2.mp3" type="audio/mp3; codecs=vorbis" autoplay ></audio>
+  <audio class="explode-audio"  src="audio/explode.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="monster-scream-audio"  src="audio/monster-scream.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="correct-audio"  src="audio/correct.mp3" type="audio/mp3; codecs=vorbis" autoplay ></audio>
+  <audio class="wrong-audio"  src="audio/wrong.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="fall-audio"  src="audio/fall.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="level-win-audio"  src="audio/level-win.mp3" type="audio/mp3; codecs=vorbis" autoplay ></audio>
+  <audio class="game-win-audio"  src="audio/game-win.mp3" type="audio/mp3; codecs=vorbis" autoplay ></audio>
+  <audio class="game-lose-audio"  src="audio/game-lose.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="moving-audio"  src="audio/moving.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="fireball-audio"  src="audio/fireball.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="boom-audio"  src="audio/boom.wav" type="audio/wav; codecs=vorbis" autoplay ></audio>
+  <audio class="scream-audio"  src="audio/scream.mp3" type="audio/mp3; codecs=vorbis" autoplay ></audio>
+  <audio class="hurt-audio"  src="audio/hurt.ogg" type="audio/ogg; codecs=vorbis" autoplay ></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/animation.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/spells.js"></script>
+  <script src="js/monsters.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

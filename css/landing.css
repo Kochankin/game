@@ -1,0 +1,309 @@
+/* CSS RESET */
+html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym,
+address, big, cite, code,del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend,table, caption, tbody, tfoot, thead,
+tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav,
+output, ruby, section, summary,time, mark, audio, video, .navbar, button {
+	margin: 0; padding: 0; border: 0; font-size: 100%; font: inherit; vertical-align: baseline; 
+}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display: block;}
+body {line-height: 1;}
+ol, ul {list-style: none;}
+blockquote, q {quotes: none;}
+blockquote:before, blockquote:after, q:before, q:after {content: ''; content: none;}
+table {border-collapse: collapse; border-spacing: 0;}
+
+/*///////// MY STYLES ///////////*/
+/* General styles */
+a { color: black; text-decoration: none;}
+
+body { 
+    font-family: 'PT Sans Narrow', sans-serif; 
+    font-size: 24px;
+}
+h1, h2, h3 {
+    font-family: 'Butcherman', cursive;
+    text-align: center;
+}
+h2{font-size: 2em;}
+h3 { font-size: 1.2em;}
+
+.header-wrapper, .about-wrapper, .screenshots-wrapper, .author-wrapper, .footer-wrapper {
+    width: 80vw;
+    margin: 0 auto;
+    padding-top: 40px;
+}
+
+/* HEADER */
+.header-wrapper {
+    height: 100vh;
+    padding-top: 20px;
+}
+
+header {
+    background: url('../img/landing-bg.jpg');
+    background-size: cover;
+}
+
+header .header {
+    display: grid;
+    grid-template-areas: "div header";
+}
+
+h1 {
+    font-size: 4em;
+    text-shadow: 5px 4px 0px lightgrey;
+    margin: 180px auto 30px;
+}
+
+header p {
+    color: white;
+    margin-bottom: 100px;
+}
+
+header .heading { text-align: center;}
+
+.logo {
+    font-family: 'Eater', cursive;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    text-shadow: 7px 5px 14px grey;
+}
+nav {justify-self: end;}
+nav ul{ display: flex;}
+
+/* Burger */
+nav .burger { 
+    display: none;
+    background: white;
+    padding: 7px 9px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+nav a {
+    color: white;
+    font-size: 28px;
+}
+
+nav ul>li {
+    margin: auto 20px;
+    transition: all 0.4s ease-out;
+    padding: 7px;
+    border-top: 3px solid transparent;
+    cursor: pointer;
+}
+
+nav ul>li:hover {
+    border-top: 3px solid white;
+}
+
+.start-button button {
+    background: lightgrey;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 7px;
+    font-size: 1.2em;
+    box-shadow: 4px 3px 2px black;
+    will-change: transform;
+    transition: all 0.4s ease-out;
+    margin-bottom: 40px;
+}
+
+.start-button:hover button {
+    transform: scale(1.1);
+}
+
+nav .burger {
+    display: none;
+}
+
+/* ABOUT */
+.about-wrapper {padding-bottom: 120px;}
+.about {background: rgba(0, 0, 0, 0.1);}
+
+.about h2+p {margin: 30px auto;}
+.intro {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 30px;
+    margin: 200px auto 0;
+    font-size: 22px;
+    text-align: center;
+}
+
+.intro li {position: relative;}
+.about i {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 56px;
+    top: -140px;
+    background-color: white;
+    padding: 26px;
+    border-radius: 50%;
+}
+
+.about li:last-of-type i {padding: 26px 37px;}
+
+/* SCREENSHOTS */
+.figures {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 30px auto;
+}
+
+.figures img {
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+.screenshots figure:first-of-type>img, figure:nth-of-type(2)>img {
+    max-width: calc(80vw / 2);
+}
+.screenshots figure:last-of-type>img {
+    max-width: calc(80vw / 1);
+}
+
+/* AUTHOR */
+.author-wrapper {padding-bottom: 100px;}
+.author {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.author-photo>img{
+    border-radius: 50%;
+    max-width: 25%;
+    margin: 50px auto;
+}
+
+.author i {
+    background: white;
+    padding: 10px;
+    border-radius: 50%;
+    margin: 10px;
+    will-change: transform;
+    transition: all 0.4s ease-out;
+}
+.author a:last-of-type i {padding: 10px 12px;}
+.author i:hover {transform: scale(1.1);}
+
+/* FOOTER */
+footer{background: black;}
+.footer-wrapper{
+    padding-bottom: 10px;
+    padding-top: 20px;
+}
+small {
+    font-size: 0.7em;
+    text-align: center;
+    color: white;
+}
+
+/* Scroll-arrow */
+.scroll-arrow {display: none;}
+.scroll-up{
+	display: block;
+	color: white;
+	font-size: 50px;
+	position: fixed;
+	right: 30px;
+	bottom: 30px;
+    text-shadow: 1px 1px 3px black;
+    will-change: transform;
+	transition: all .4s ease-out;
+}
+.scroll-up:hover{transform: scale(1.1);}
+
+/* MEDIA QUERIES*/
+
+@media (max-width: 870px) {
+    .screenshots .figures {
+        flex-direction: column;
+        flex-wrap: nowrap;
+    } 
+    .screenshots figure:first-of-type>img, figure:nth-of-type(2)>img  {
+        max-width: calc(80vw / 1);
+    }
+}
+
+@media (max-width: 720px) {
+    nav .burger {
+        display: inline-block;
+        will-change: transform;
+        transition: all 0.4s ease-out;
+    }
+    .header nav ul {display: none;}
+    nav ul.open {
+        position: absolute;
+        left: 50%;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        width: 100%;
+        padding: 20px auto;
+        z-index: 1000;
+    }
+    nav ul.open li {
+        padding: 20px;
+        margin: 0;      
+    }
+    nav ul.open li:hover{background: white;}
+
+    nav ul.open li a {color: black; }
+    .author-photo>img {max-width: 50%;}
+    .header-wrapper {
+        height: auto;
+        width: auto;
+        padding-top: 0;
+    }
+    .start-button button { margin: 40px auto;}
+    .header p { margin-bottom: 40px;}
+    .header {
+        padding: 20px 10vw 10px;
+        background: rgba(255, 255, 255, 0.5);
+        position: relative;
+        box-sizing: border-box;
+    }
+    .heading {width: 80vw;}
+    .logo {text-shadow: 7px 5px 14px black;}
+    .fa-times {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        z-index: 1001;
+        cursor: pointer;
+        will-change: transform;
+        transition: all 0.4s ease-out;
+    }
+    .fa-times:hover, .burger:hover {transform: scale(1.1);}
+}
+
+
+@media (max-width: 620px) {
+    h1 { font-size: 3.5em;}
+    .about h2+p { text-align: justify;}
+    .about i {padding: 20px;}
+    .intro {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 1fr);
+        margin: 0;
+    }
+    .intro li { margin-top: 180px;}
+    .about-wrapper {padding-bottom: 80px;}
+}
+
+@media (max-width: 480px) {
+    body {font-size: 22px;}
+    h1 {margin: 40px auto;}
+    header p {margin-bottom: 40px;}
+}
+
+@media (max-width: 420px) {
+    h2 {font-size: 1.7em;}
+    .author-wrapper {padding-bottom: 60px; }
+}
