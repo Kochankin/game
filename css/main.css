@@ -36,6 +36,8 @@ input {
 	z-index: 0;
 }
 
+
+/* GAME BOARD */
 .bottom {
 	width: 100vw;
 	height: 15vh;
@@ -43,6 +45,12 @@ input {
 	position: fixed;
 	bottom: 0;
 	z-index: 10;
+}
+
+.top {
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	padding-top: 20px;
 }
 
 .exit-button{
@@ -60,14 +68,8 @@ input {
 	transform: scale(1.1);
 	cursor: pointer;
 }
-.top {
-	display: grid;
-	grid-template-columns: repeat(8, 1fr);
-	padding-top: 20px;
-}
 
-.level {grid-column: 4/6;}
-.user-board{	grid-column: 1/3;}
+.user-board{grid-column: 1/3;}
 .monster-board{grid-column: 7/9;}
 .board {
 	display: grid;
@@ -75,6 +77,7 @@ input {
 }
 
 .level {
+	grid-column: 4/6;
 	font-size: 70px;
 	text-align: center;
 	border-radius: 50%;
@@ -94,6 +97,7 @@ input {
 	max-height: 35px;
 }
 
+/* Health */
 .health {
 	font-size: 30px;
 	text-align: center;
@@ -103,11 +107,6 @@ input {
 	height: 35px;	
 	display: flex;
 }
-
-.monster-board .health {
-    justify-content: flex-end;
-}
-
 .health::after {
 	content: "";
 	width: 37px;
@@ -117,20 +116,14 @@ input {
 	position: absolute;
 	top:5px;	
 }
-.user-board .health::after{
-	right: -50px;
-}
-
-.monster-board .health::after{
-	left: -50px;
-}
-
+.monster-board .health {justify-content: flex-end;}
+.user-board .health::after{right: -50px;}
+.monster-board .health::after{left: -50px;}
 .health>div{
 	height: 35px;
 	background: red;
 	width: 100%;
 }
-
 .health>span {
 	position: absolute;
     left: 50%;
@@ -138,6 +131,7 @@ input {
     z-index: 100
 }
 
+/* Spells board */
 .spells-board {
 	background-image: url('../img/wheel.png');
 	background-size: cover;
@@ -151,6 +145,8 @@ input {
 	transition: all 0.5s ease-in;
 }
 
+.spells-board.no-click {pointer-events: none;} /* to avoid clicking*/
+
 .spell {
 	background: url('../img/spellsMenu.png');
 	background-size: cover;
@@ -158,8 +154,9 @@ input {
 	height: 80px;
 	position: absolute;
 	background-color: rgba(255, 255, 255, 0.7);
-	border-radius: 45%;
+	border-radius: 50%;
 	transition: all 0.4s ease-out;
+	border: 1px solid #64227c;
 }
 
 .spell:hover{
@@ -181,67 +178,60 @@ input {
 	transform: scale(1.1);
 	cursor: pointer;
 }
-
 .fire-spell {
 	background-position-x:247px;
-	left: 116px;
+	left: 110px;
 	top: -81px;
 }
 .fire-spell+span { 
-	top: 1px;
+	top: 0;
     left: 95px;
 }
-
 .arrow-spell {
 	background-position-x:326px;
-	top: -21px;
-  left: -39px;
+	top: -23px;
+    left: -31px;
 }
 .arrow-spell+span { 
 	top: 59px;
-  left: -73px;
+    left: -64px;
 }
-
 .freeze-spell {
 	background-position-x:410px;
 	right: -31px;
-  top: -23px;
+	top: -23px;
 }
 .freeze-spell+span {
 	top: 58px;
-  right: -34px;
+    right: -50px;
 }
-
 .lightning-spell {
 	background-position-x:167px;
-	left: -35px;
-  bottom: -18px;
+	left: -31px;
+    bottom: -23px;
 }
 .lightning-spell+span { 
 	bottom: 57px;
-  left: -41px;
+    left: -44px;
 }
-
 .poison-spell {
 	background-position-x:83px;
-	right: -27px;
-	bottom: -26px;
+	right: -31px;
+	bottom: -23px;
 }
 .poison-spell+span {
-	bottom: 55px;
-	right: -75px;
+	bottom: 58px;
+    right: -80px;
 }
-
 .rain-spell {
 	background-position-x:-1px;
 	bottom: -81px;
-  left: 118px;
+    left: 110px;
 }
 .rain-spell+span { 
 	bottom: 0px;
-	left: 69px;
+	left: 64px;
 }
-
 
 /* Characters */
 #katy {
@@ -299,22 +289,8 @@ input {
 	margin-top: 40px;	
 }
 
-/* Animation css */
-@keyframes bounce {
-    from {bottom: calc(15vh - 10px)}
-    50%  {bottom: calc(15vh);}
-	100% {bottom: calc(15vh - 10px);}
-  }
-
-@keyframes attack {
-    from {right: 5vw;}
-    30%  {right: calc(5vw - 50px);}
-	70% {right: calc(5vw + 100px);}
-	100% {right: 5vw;}
-}
-
   /* Task window */
-  .task-window {
+.task-window {
 	background: rgba(249, 253, 255, 0.9);
 	width: 100vw;
 	height: 100vh;
@@ -322,7 +298,7 @@ input {
 	z-index: 1000;
 	top: 0;
 	display: none; /**/
-  }
+}
 
   .task-wrapper{
 	background: rgba(249, 253, 255, 0.95);
@@ -351,15 +327,10 @@ input {
 	transform: scale(1.1);
 	cursor: pointer;
   }
-.close-button:focus {
-	outline: none;
-}
-
+.close-button:focus {outline: none;}
 
 /* Task */
-.task-heading {
-	margin-bottom: 40px;
-}
+.task-heading {margin-bottom: 40px;}
 .submit-button {
 	display: block;
 	padding: 10px;
@@ -448,12 +419,12 @@ input {
 	outline: none;
 }
 
-/*Rain spell*/
-.rain .div-wrapper, .rain .p-wrapper {
+/*Rain spell, Phonetic spell*/
+.p-wrapper, .div-wrapper {
 	display: flex;
 	justify-content: center;
 }
-.rain div {
+.rain div, .phonetic div {
     font-size: 1.2em;
     border: 2px solid;
     border-radius: 5px;
@@ -463,30 +434,86 @@ input {
 	margin: 10px;
 	user-select: none;
 }
-.rain .word {
+.word, .letter {
 	padding: 15px;
     margin: 40px 10px 0px;
     background: lightgrey;
 	border-radius: 50%;
-	user-select: none;
-	
+	user-select: none;	
 }
 
-.rain div.highlight {
-	background: lightgreen;
-}
-
-.rain div.hover{
+.word:hover, .letter:hover {cursor: pointer;}
+div.highlight, .solution-box.highlight {background: lightgreen;}
+div.hover,   .solution-box.hover {
 	border: 2px dashed;
 	background-color: rgba(255, 238, 50, 0.5);
-	cursor: pointer;
+}
+.rain .p-wrapper,  .phonetic .p-wrapper, .compose .p-wrapper{min-height: 120px;}
+
+.compose div, .translation .solution-box  {
+    font-size: 1.2em;
+    border: 2px solid;
+    border-radius: 5px;
+	padding: 15px;
+	color: #64227c;
+	background:white;
+	margin: 10px;
+	user-select: none;
+	width: 40px;
+	height: 50px;
 }
 
-.rain .p-wrapper {
-	min-height: 120px;
+/* Translation spell */
+.translation .word {margin: 20px 10px 0px;}
+.translation .solution-box {
+	width: 150px;
+	height: 50px;
+	align-self: center;
 }
 
-/* Spell-image*/
+.translation .pic {
+	width: 220px;
+    height: 150px;
+    background-size: cover;
+	border: 1px solid #64227c;
+	background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.translation .task-heading {margin-bottom: 20px;}
+
+/* Months spell */
+.months .month-div {
+	margin-bottom: 20px;
+    color: #64227c;
+    font-size: 1.3em;
+}
+
+/* Geography-spell */
+.geography .word {border: 2px solid transparent;}
+.geography .word:hover {
+	background-color: #ffee32;
+	border: 2px solid #64227c;
+	color: #64227c;
+}
+
+/* Sentence parts spell */
+.sentence .p-wrapper span {
+	white-space: pre-wrap;
+	color: #64227c;
+	font-size: 1.1em;
+	border-bottom: 5px solid transparent;
+}
+.sentence .p-wrapper span:hover {color: black;}
+.sentence .task-heading {
+	display: flex;
+    flex-direction: column;
+}
+.sentence .task-heading>span:last-child {font-size: 0.5em;}
+.sentence .p-wrapper span.subject {border-bottom: 2px solid black;}
+.sentence .p-wrapper span.predicate {border-bottom: 5px double black;}
+
+/* Spell-image  __ for animation__ */
 .spell-img {
 	background: url('../img/spells.png');
 	background-size: cover;
@@ -501,27 +528,13 @@ input {
 	transition: all 0.4s ease-out;
 }
 
-.spell-img.fire{
-	background-position-x: 500px;
-}
-.spell-img.freeze{
-	background-position-x: 100px;
-}
-.spell-img.rain{
-	background-position-x: 300px;
-}
-.spell-img.poison{
-	background-position-x: 200px;
-}
-.spell-img.lightning{
-	background-position-x: 400px;
-}
-.spell-img.arrow{
-	background-position-x: 0;
-}
-
+.spell-img.fire{background-position-x: 500px;}
+.spell-img.freeze{background-position-x: 100px;}
+.spell-img.rain{background-position-x: 300px;}
+.spell-img.poison{background-position-x: 200px;}
+.spell-img.lightning{background-position-x: 400px;}
+.spell-img.arrow{background-position-x: 0;}
 .hide {visibility: hidden;}
-
 #explosion {
 	position: absolute;
     bottom: calc(15vh + 200px);
@@ -529,21 +542,7 @@ input {
     z-index: 20;
 }
 
-/* Animation */
-@keyframes animateSpell {
-	from {
-	   margin-left: calc(5vw + 250px);
-		opacity: 1;
-	}
-	90% {
-		margin-right: calc(5vw);	
-	}
-	100% {
-		opacity: 0;
-	}
-  }
-
-  /* Monster smoke */
+/* Monster smoke */
   .monster-smoke {
 	background: url('../img/monster-smoke.png');
 	background-size: cover;
@@ -558,16 +557,6 @@ input {
 	transition: all 0.4s ease-out;
 }
 
-@keyframes animateMonsterSmoke {
-	from {
-	   right: 25vw;
-	}
-	100% {
-		right: 80vw;
-		opacity: 0;
-	}
-  }
-
   #smoke {
 	position: absolute;
     bottom: 30px;
@@ -575,19 +564,7 @@ input {
     z-index: 20;
 }
 
-
-/* MONSTER DEATH */
-@keyframes animateMonsterDeath {
-	from {
-	   transform: rotate(0);
-	}
-	100% {
-		transform: rotate(90deg);
-    	transform-origin: 70px 225px;
-	}
-  }
-
-  /* Win/lost notice */
+/* Win/lost notice */
 .notice {
 	height: 100vh;
 	width: 100vw;
@@ -652,10 +629,7 @@ input {
 	text-align: center;
 }
 
-.results-page th {
-	background-color: aliceblue;
-}
-
+.results-page th {background-color: aliceblue;}
 .results-page button {
 	padding: 10px;
 	border: 2px solid #64227c;
@@ -670,7 +644,48 @@ input {
 	transform: scale(1.1);
 	cursor: pointer;
 }
+.results-page table {background: white;}
 
-.results-page table {
-	background: white;
+/* Animation css */
+/* Monster bounce */
+@keyframes bounce {
+    from {bottom: calc(15vh - 10px)}
+    50%  {bottom: calc(15vh);}
+	100% {bottom: calc(15vh - 10px);}
+  }
+
+  /* Monster attack */
+@keyframes attack {
+    from {right: 5vw;}
+    30%  {right: calc(5vw - 50px);}
+	70% {right: calc(5vw + 100px);}
+	100% {right: 5vw;}
 }
+
+/* Apply a spell */
+@keyframes animateSpell {
+	from {
+	   margin-left: calc(5vw + 250px);
+	opacity: 1;
+	}
+	90% {margin-right: calc(5vw);}
+	100% {opacity: 0;}
+  }
+
+  /* Monster send smoke */
+  @keyframes animateMonsterSmoke {
+	from {right: 25vw;}
+	100% {
+		right: 80vw;
+		opacity: 0;
+	}
+  }
+
+  /* MONSTER DEATH */
+@keyframes animateMonsterDeath {
+	from {transform: rotate(0);}
+	100% {
+		transform: rotate(90deg);
+    	transform-origin: 70px 225px;
+	}
+  }

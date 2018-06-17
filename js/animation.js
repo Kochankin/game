@@ -1,8 +1,7 @@
 'use strict';
 
 (function () {
-
-    // katy animation
+    // Katy animation / -INIT FUNCTION- /
   function initKaty(){
     const toReturn =[];
     // Get canvas for katy
@@ -34,6 +33,7 @@
     return toReturn;
   }
 
+  //  / -SHOOT- /
   function initShoot(){
     const canvasKaty = document.getElementById("katy");
     const canvasKatyImage = new Image();	
@@ -65,7 +65,7 @@
   let canvasKatyImage = arr[0];
   let contextKaty = arr[1];
  
-  // dead
+  // / -DEAD- / 
   const dead = sprite({
     width: 3000, 
     height: 250,
@@ -80,6 +80,7 @@
     dead.render();
   }
 
+  // / -SPRITE FUNCTION- /
   function sprite (options, context) {
     let that = {},
         frameIndex = 0,
@@ -87,7 +88,6 @@
         ticksPerFrame = options.ticksPerFrame || 0,
         numberOfFrames = options.numberOfFrames || 1;
         
-    //that.context = options.context;
     that.width = options.width;
     that.height = options.height;
     that.image = options.image;

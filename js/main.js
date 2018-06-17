@@ -28,7 +28,7 @@
   }
 
 
-// container for requesting a user name
+// INIT container for requesting a user name
 function renderUserNameRequest() {
   const popUpWindow = window.utils.createEl('div'),
         p = window.utils.createEl('p'), 
@@ -46,11 +46,12 @@ function renderUserNameRequest() {
   popUpWindow.appendChild(button);
   popUpWindow.appendChild(warning);
   const documentFragment = document.createDocumentFragment();
+  document.querySelector('.spells-board').classList.add('no-click');
   documentFragment.appendChild(popUpWindow);
   document.querySelector('.container').before(documentFragment);
 }
 
-// save user name
+// Save user name (on button click)
 function saveUserName(){
   let userNameRequestInput = _.trim(document.querySelector('.user-name-request>input').value);
   if (!userNameRequestInput) { 
@@ -60,9 +61,11 @@ function saveUserName(){
     localStorage.setItem('userName', stringify(userName));
     document.querySelector('body').removeChild(document.querySelector('.user-name-request'));
     document.querySelector('.user-board>.name').textContent = userName;
+    document.querySelector('.spells-board').classList.remove('no-click');
   }
 }
 
+// Call after win or "new game"-button click
 function initLevel(){
   document.addEventListener('click', function(){
     window.utils.soundEffect('.click-audio');
@@ -160,7 +163,7 @@ function checkState() {
 
       // update level
       let level = parse(localStorage.level);
-      if (level === 3) {   
+      if (level === 4) {   
         level = 1;
       } else {
         ++level;
@@ -193,6 +196,7 @@ function checkState() {
   // if user or monster are alive
   } else {
     document.querySelector('.main-audio').play();
+    document.querySelector('.spells-board').classList.remove('no-click');
   }
 }
 
@@ -213,7 +217,6 @@ function showNotice(win) {
 function hideNotice(){
   document.querySelector('body').removeChild(document.querySelector('.notice'));
 }
-
 
 // Spinner for loading imitation
 function showSpinner() {
@@ -279,6 +282,7 @@ function showResultsTable(){
 
   document.querySelector('.main-audio').pause();
   setTimeout(function(){ document.querySelector('.results-audio').play();}, 200);
+  document.querySelector('.spells-board').classList.remove('no-click');
 }
 
 function insertCells(el, cell) {
@@ -301,8 +305,6 @@ function battleAnimation(win, currentTask){
   function animation() {
     if (win) { // -WIN-
       // shoot
-     // window.animation.canvasKatyImage.addEventListener("load", window.animation.animateShoot);
-      //window.animation.canvasKatyImage.src = "img/shoot.png";
       window.animation.initShoot();
      
       setTimeout( function(){

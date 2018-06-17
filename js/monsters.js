@@ -2,7 +2,7 @@
 
 (function () {
 
-// for monster name generating
+// MONSTER NAME generating
  const monsterNames = {
   type: ["ужасный", "злобный", "сопливый", "страшный", "опасный", "могучий", "неуловимый", "великий", "стойкий", "бессмертный", "всесильный", "вонючий", "волосатый", "неугомонный", "унылый", "кошмарный", "грязный", "слюнявый"],
   kind: ["Огр", "Гном", "Гоблин", "Эльф", "Зомби", "Соплохвост", "Глиноклок", "Громамонт", "Грюмошмель", "Йети", "Квинтолап", "Клешнепод", "Тролль", "Великан", "Вампир", "Штырехвост", "Упырь", "Раздражар", "Пеплозмей", "Наргл", "Лепрекон"],
@@ -13,7 +13,7 @@ function getMonsterName(array) {
   return _.sample(array.type) + ' ' + _.sample(array.kind) + ' ' + _.sample(array.name);
 }
 
-// monster appearance generating
+// MONSTER APPEARANCE generating
 const monsterParts = {
   head: {src: 'img/head.png', partsNum: 13, sx: 0, sy: 0, swidth: 301, sheight: 250, x: 80, y: 0, width: 110, height: 100},
   body: {src: 'img/body.png', partsNum: 7, sx: 0, sy: 0, swidth: 400, sheight: 400, x: 55, y: 75, width: 160, height: 160},
