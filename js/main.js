@@ -190,6 +190,7 @@ function checkState() {
         initLevel();
       },  5000);// load next level
       document.querySelector('.main-audio').play();
+      document.querySelector('.spells-board').classList.remove('no-click');
     } else {
       setTimeout(showResultsTable,  5000); // show results
     }

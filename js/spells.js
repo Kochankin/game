@@ -86,12 +86,12 @@
 
     // Spells-click handlers
     const spellHandlers = {
-        'fire-spell': fireSpellHandler,
-        'arrow-spell': arrowSpellHandler,
-        'freeze-spell': freezeSpellHandler,
-        'lightning-spell': lightningSpellHandler,
-        'poison-spell': poisonSpellHandler,
-        'rain-spell': rainSpellHandler
+      'fire-spell': fireSpellHandler,
+      'arrow-spell': arrowSpellHandler,
+      'freeze-spell': freezeSpellHandler,
+      'lightning-spell': lightningSpellHandler,
+      'poison-spell': poisonSpellHandler,
+      'rain-spell': rainSpellHandler
     }
 
     // Spells on click

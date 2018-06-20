@@ -42,14 +42,27 @@ function generatePartsArr (partsNum, value){
     const monster = document.getElementById("monster");
     const ctx = monster.getContext('2d');
 
-    ctx.globalCompositeOperation="destination-over"; 
-    const head = monsterParts.head;
-    const headParts = generatePartsArr(head.partsNum, head.swidth);
-    const thisHead = _.sample(headParts);
-    headImage.src = head.src;  
-    headImage.onload = function() {  
-      ctx.drawImage(headImage, thisHead, head.sy,head.swidth,head.sheight,head.x,head.y,head.width,head.height);
-    }
+    ctx.globalCompositeOperation="source-over"; 
+
+    setTimeout(() => {
+      const body = monsterParts.body;
+      bodyImage.src = body.src;  
+      const bodyParts = generatePartsArr(body.partsNum, body.swidth);
+      bodyImage.onload = function() {   
+        ctx.drawImage(bodyImage, _.sample(bodyParts), body.sy, body.swidth, body.sheight, body.x, body.y, body.width, body.height);
+      }
+
+      setTimeout(() => {
+        const head = monsterParts.head;
+        const headParts = generatePartsArr(head.partsNum, head.swidth);
+        const thisHead = _.sample(headParts);
+        headImage.src = head.src;  
+        headImage.onload = function() {  
+          ctx.drawImage(headImage, thisHead, head.sy,head.swidth,head.sheight,head.x,head.y,head.width,head.height);
+        }
+      }, 200);
+
+    }, 150);
 
     const lArm = monsterParts.lArm;
     const armParts = generatePartsArr(lArm.partsNum, lArm.sheight);
@@ -86,13 +99,6 @@ function generatePartsArr (partsNum, value){
       ctx.drawImage(weaponImage,  _.sample(weaponParts), weapon.sy,weapon.swidth,weapon.sheight,weapon.x,weapon.y,weapon.width,weapon.height); 
     }
 
-    ctx.globalCompositeOperation = 'source-over';
-    const body = monsterParts.body;
-    bodyImage.src = body.src;  
-    const bodyParts = generatePartsArr(body.partsNum, body.swidth);
-    bodyImage.onload = function() {   
-      ctx.drawImage(bodyImage, _.sample(bodyParts), body.sy, body.swidth, body.sheight, body.x, body.y, body.width, body.height);
-    }
     
   }
 

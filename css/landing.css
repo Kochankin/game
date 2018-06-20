@@ -269,7 +269,10 @@ small {
         position: relative;
         box-sizing: border-box;
     }
-    .heading {width: 80vw;}
+    .heading {
+        text-align: center;
+        margin: auto 10vw;
+    }
     .logo {text-shadow: 7px 5px 14px black;}
     .fa-times {
         position: absolute;
