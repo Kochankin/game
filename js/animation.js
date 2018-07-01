@@ -1,17 +1,21 @@
 'use strict';
 
 (function () {
-    // Katy animation / -INIT FUNCTION- /
+
+   const canvasKaty = document.getElementById("katy");
+   const contextKaty = canvasKaty.getContext("2d");
+   const canvasKatyImage = new Image();
+   canvasKaty.width = 300; 
+   canvasKaty.height = 250;
+
+   const monsterCanvas = document.querySelector('#monster');
+
+
+    //  -INIT FUNCTION- /
   function initKaty(){
-    const toReturn =[];
-    // Get canvas for katy
-    const canvasKaty = document.getElementById("katy");
-    const canvasKatyImage = new Image();	
-    const contextKaty = canvasKaty.getContext("2d");
-    canvasKaty.width = 300; 
-    canvasKaty.height = 250;
-    
-    // Create sprite
+    canvasKatyImage.addEventListener("load", animateIddle);
+    canvasKatyImage.src = "img/iddle.png"; 
+
     const iddle = sprite({
       width: 3000, 
       height: 250,
@@ -20,28 +24,18 @@
       ticksPerFrame: 6, 
     }, contextKaty);
 
-    // Load sprite sheet
-    canvasKatyImage.addEventListener("load", animateIddle);
-    canvasKatyImage.src = "img/iddle.png"; 
-
     function animateIddle () {
       window.requestAnimationFrame(animateIddle);
       iddle.loop();
       iddle.render();
     }
-    toReturn.push(canvasKatyImage, contextKaty)
-    return toReturn;
   }
 
   //  / -SHOOT- /
   function initShoot(){
-    const canvasKaty = document.getElementById("katy");
-    const canvasKatyImage = new Image();	
-    const contextKaty = canvasKaty.getContext("2d");
-    canvasKaty.width = 300; 
-    canvasKaty.height = 250;
+    canvasKatyImage.addEventListener("load", animateShoot);
+    canvasKatyImage.src = "img/shoot.png"; 
 
-      // shoot
     const shoot = sprite({
       width: 1240, 
       height: 250,
@@ -50,10 +44,6 @@
       ticksPerFrame: 30, 
     }, contextKaty);
 
-    // Load sprite sheet
-    canvasKatyImage.addEventListener("load", animateShoot);
-    canvasKatyImage.src = "img/shoot.png"; 
-
     function animateShoot () {
       window.requestAnimationFrame(animateShoot);
       shoot.motion();
@@ -61,24 +51,76 @@
     }
   }  
 
-  const arr = initKaty();
-  let canvasKatyImage = arr[0];
-  let contextKaty = arr[1];
- 
   // / -DEAD- / 
-  const dead = sprite({
-    width: 3000, 
-    height: 250,
-    image: canvasKatyImage,
-    numberOfFrames: 10, 
-    ticksPerFrame: 6, 
-  }, contextKaty);
+  function initDead() {
+    canvasKatyImage.addEventListener("load", animateDead);
+    canvasKatyImage.src = "img/dead.png"; 
 
-  function animateDead () {
-    window.requestAnimationFrame(animateDead);
-    dead.motion();
-    dead.render();
+    const dead = sprite({
+      width: 3000, 
+      height: 250,
+      image: canvasKatyImage,
+      numberOfFrames: 10, 
+      ticksPerFrame: 6, 
+   }, contextKaty);
+
+    function animateDead () {
+      window.requestAnimationFrame(animateDead);
+      dead.motion();
+      dead.render();
+    }
   }
+
+  // / -EXPLOSION- /
+  function initExplosion() {
+    const canvasExpl = document.querySelector('#explosion');
+    canvasExpl.width = 100; 
+    canvasExpl.height = 98;
+    const canvasExplImage = new Image();	
+    const contextExpl = canvasExpl.getContext("2d");
+
+    canvasExplImage.addEventListener("load", animateExplosion);
+    canvasExplImage.src = "img/explosion.png"; 
+
+    const explosion = window.animation.sprite({
+      width: 1000, 
+      height: 98,
+      image: canvasExplImage,
+      numberOfFrames: 10, 
+      ticksPerFrame: 6, 
+    }, contextExpl);
+
+    function animateExplosion () {
+        window.requestAnimationFrame(animateExplosion);
+        explosion.motion();
+        explosion.render();
+    }
+  }
+
+  // / -SMOKE- /
+  function initSmoke() {
+    const canvasSmoke = document.querySelector('#smoke');
+    canvasSmoke.width = 267; 
+    canvasSmoke.height = 267;
+    const canvasSmokeImage = new Image();	
+    const contextSmoke = canvasSmoke.getContext("2d");
+    canvasSmokeImage.addEventListener("load", animateSmoke);
+    canvasSmokeImage.src = "img/smoke.png"; 
+
+    const smoke = window.animation.sprite({
+      width: 2670, 
+      height: 267,
+      image: canvasSmokeImage,
+      numberOfFrames: 10, 
+      ticksPerFrame: 6, 
+    }, contextSmoke);
+
+    function animateSmoke() {
+      window.requestAnimationFrame(animateSmoke);
+      smoke.motion();
+      smoke.render();
+    }
+}
 
   // / -SPRITE FUNCTION- /
   function sprite (options, context) {
@@ -116,7 +158,6 @@
         
     that.render = function () {	
       context.clearRect(0, 0, that.width, that.height);	 // Clear the canvas 
-      // Draw the animation
       context.drawImage( that.image, frameIndex * that.width / numberOfFrames, 0, that.width / numberOfFrames, that.height, 0, 0, that.width / numberOfFrames, that.height);
     };	
     return that;
@@ -125,9 +166,11 @@
   window.animation = {
     initKaty : initKaty,
     canvasKatyImage: canvasKatyImage,
-    animateDead : animateDead,
     sprite : sprite,
-    initShoot : initShoot
+    initShoot : initShoot,
+    initDead : initDead,
+    initExplosion : initExplosion,
+    initSmoke : initSmoke
   };
 
 })();

@@ -2,6 +2,9 @@
 
 (function () {
 
+  const monster = document.getElementById("monster");
+  const ctx = monster.getContext('2d');
+
 // MONSTER NAME generating
  const monsterNames = {
   type: ["ужасный", "злобный", "сопливый", "страшный", "опасный", "могучий", "неуловимый", "великий", "стойкий", "бессмертный", "всесильный", "вонючий", "волосатый", "неугомонный", "унылый", "кошмарный", "грязный", "слюнявый"],
@@ -26,80 +29,105 @@ const monsterParts = {
 
 function generatePartsArr (partsNum, value){
     const arr = [];
-    for (let i = 0; i < partsNum; i++ ){arr.push(i*value); }
+    for (let i = 0; i < partsNum; i++ ){arr.push(i * value); }
     return arr;
+  }
+
+  function generateBodyPart(part){
+    const partImage = new Image(); 
+    partImage.src = part.src; 
+    return partImage;
+  }
+
+  function loadLArm(lArm, lArmImage, thisArm) {
+    return function() { 
+      ctx.drawImage(lArmImage,  lArm.sx, thisArm,  lArm.swidth, lArm.sheight, lArm.x, lArm.y, lArm.width, lArm.height);
+    }
+  }
+
+  function loadRArm(rArm, rArmImage, thisArm) {
+    return function() { 
+      ctx.drawImage(rArmImage,  rArm.sx, thisArm,  rArm.swidth, rArm.sheight, rArm.x, rArm.y, rArm.width, rArm.height);
+    }
+  }
+
+  function loadLLeg(lLeg, lLegImage, thisLeg) {
+    return function() {   
+      ctx.drawImage(lLegImage, thisLeg, lLeg.sy, lLeg.swidth, lLeg.sheight, lLeg.x, lLeg.y, lLeg.width, lLeg.height);  
+    }
+  }
+
+  function loadRLeg(rLeg, rLegImage, thisLeg) {
+    return function() {   
+      ctx.drawImage(rLegImage, thisLeg, rLeg.sy, rLeg.swidth, rLeg.sheight, rLeg.x, rLeg.y, rLeg.width, rLeg.height);  
+    }
+  }
+
+  function loadWeapon(weapon, weaponImage) {
+    return function() {   
+      ctx.drawImage(weaponImage,  _.sample(generatePartsArr(weapon.partsNum, weapon.swidth)), weapon.sy,weapon.swidth,weapon.sheight,weapon.x,weapon.y,weapon.width,weapon.height);
+    }
+  }
+
+  function loadBody(body, bodyImage) {
+    return function() {   
+      ctx.drawImage(bodyImage, _.sample(generatePartsArr(body.partsNum, body.swidth)), body.sy, body.swidth, body.sheight, body.x, body.y, body.width, body.height);
+    }
+  }
+
+  function loadHead(head, headImage, thisHead) {
+    return headImage.onload = function() {  
+      ctx.drawImage(headImage, thisHead, head.sy,head.swidth,head.sheight,head.x,head.y,head.width,head.height);
+    }
   }
   
   function generateMonster(){
-    const lArmImage = new Image(); 
-    const rArmImage = new Image(); 
-    const lLegImage = new Image(); 
-    const rLegImage = new Image(); 
-    const bodyImage = new Image(); 
-    const headImage = new Image(); 
-    const weaponImage = new Image(); 
-  
-    const monster = document.getElementById("monster");
-    const ctx = monster.getContext('2d');
-
-    ctx.globalCompositeOperation="source-over"; 
-
-    setTimeout(() => {
-      const body = monsterParts.body;
-      bodyImage.src = body.src;  
-      const bodyParts = generatePartsArr(body.partsNum, body.swidth);
-      bodyImage.onload = function() {   
-        ctx.drawImage(bodyImage, _.sample(bodyParts), body.sy, body.swidth, body.sheight, body.x, body.y, body.width, body.height);
-      }
-
-      setTimeout(() => {
-        const head = monsterParts.head;
-        const headParts = generatePartsArr(head.partsNum, head.swidth);
-        const thisHead = _.sample(headParts);
-        headImage.src = head.src;  
-        headImage.onload = function() {  
-          ctx.drawImage(headImage, thisHead, head.sy,head.swidth,head.sheight,head.x,head.y,head.width,head.height);
-        }
-      }, 200);
-
-    }, 150);
-
     const lArm = monsterParts.lArm;
-    const armParts = generatePartsArr(lArm.partsNum, lArm.sheight);
-    const thisArm = _.sample(armParts);
-    lArmImage.src = lArm.src;  
-    lArmImage.onload = function() { 
-      ctx.drawImage(lArmImage,  lArm.sx, thisArm,  lArm.swidth, lArm.sheight, lArm.x, lArm.y, lArm.width, lArm.height);
-    }
-    
+    const lArmImage = generateBodyPart(lArm);
+    const thisArm = _.sample(generatePartsArr(lArm.partsNum, lArm.sheight));
     const rArm = monsterParts.rArm;
-    rArmImage.src = rArm.src;  
-    rArmImage.onload = function() { 
-      ctx.drawImage(rArmImage,  rArm.sx, thisArm,  rArm.swidth, rArm.sheight, rArm.x, rArm.y, rArm.width, rArm.height);
-    }
-  
-    const lLeg = monsterParts.lLeg;
-    lLegImage.src = lLeg.src; 
-    const legParts = generatePartsArr(lLeg.partsNum, lLeg.swidth); 
-    const thisLeg = _.sample(legParts);
-    lLegImage.onload = function() {   
-      ctx.drawImage(lLegImage, thisLeg, lLeg.sy, lLeg.swidth, lLeg.sheight, lLeg.x, lLeg.y, lLeg.width, lLeg.height);   
-    }
-  
-    const rLeg = monsterParts.rLeg;
-    rLegImage.src = rLeg.src;  
-    rLegImage.onload = function() {   
-      ctx.drawImage(rLegImage, thisLeg, rLeg.sy, rLeg.swidth, rLeg.sheight, rLeg.x, rLeg.y, rLeg.width, rLeg.height); 
-    }
-    
-    const weapon = monsterParts.weapon;
-    weaponImage.src = weapon.src; 
-    const weaponParts = generatePartsArr(weapon.partsNum, weapon.swidth); 
-    weaponImage.onload = function() {   
-      ctx.drawImage(weaponImage,  _.sample(weaponParts), weapon.sy,weapon.swidth,weapon.sheight,weapon.x,weapon.y,weapon.width,weapon.height); 
-    }
+    const rArmImage = generateBodyPart(rArm);
 
-    
+    const lLeg = monsterParts.lLeg;
+    const lLegImage = generateBodyPart(lLeg);
+    const thisLeg = _.sample(generatePartsArr(lLeg.partsNum, lLeg.swidth));
+    const rLeg = monsterParts.rLeg;
+    const rLegImage = generateBodyPart(rLeg);
+
+    const weapon = monsterParts.weapon;
+    const weaponImage = generateBodyPart(weapon);
+
+    const body = monsterParts.body;
+    const bodyImage = generateBodyPart(body);
+
+    const head = monsterParts.head;
+    const thisHead = _.sample(generatePartsArr(head.partsNum, head.swidth));
+    const headImage = generateBodyPart(head);
+
+    Promise.all([
+      new Promise((resolve) => {    
+        lArmImage.onload = loadLArm(lArm, lArmImage, thisArm);
+        resolve(); 
+      }), // lArm
+      new Promise((resolve) => {      
+        rArmImage.onload = loadRArm(rArm, rArmImage, thisArm);
+          resolve();
+      }), // rArm
+      new Promise((resolve) => { 
+        lLegImage.onload = loadLLeg(lLeg, lLegImage, thisLeg);  
+        resolve();
+      }),  // lLeg
+      new Promise((resolve) => {    
+        rLegImage.onload = loadRLeg(rLeg, rLegImage, thisLeg);
+        resolve();
+      }),  // rLeg  
+      new Promise((resolve) => {    
+        weaponImage.onload = loadWeapon(weapon, weaponImage); 
+        resolve();
+      })  // weapon
+    ])
+    .then(() => {bodyImage.onload = loadBody(body, bodyImage);}) // body
+    .then(() => { loadHead(head, headImage, thisHead); });// head
   }
 
 window.monsters = {

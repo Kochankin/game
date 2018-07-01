@@ -57,9 +57,17 @@
 
   function restore() {
     window.animation.initKaty();
+    document.querySelector('.task-window').style.display = 'none';
     show(document.querySelector('.spells-board'));
+    document.querySelector('.spells-board').classList.remove('no-click');
     document.querySelector('#monster').style.animationName = 'bounce';
     document.querySelector('#monster').style.animationIterationCount = 'infinite';  
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(function(audio){
+      audio.pause();
+      audio.currentTime = 0;
+    });
+    document.querySelector('.main-audio').play();
   } 
 
   function soundEffect(sound){
@@ -69,6 +77,13 @@
   function startAudio(){
     document.querySelector('.main-audio').play();
     document.removeEventListener('change',  startAudio);
+    document.addEventListener('click', function(){
+      window.utils.soundEffect('.click-audio');
+    });
+  }
+
+  function compare (arrA, arrB) {
+    return arrB[1] - arrA[1];
   }
 
   window.utils = {
@@ -85,7 +100,8 @@
     initUtterance : initUtterance,
     restore : restore,
     soundEffect : soundEffect,
-    startAudio : startAudio
+    startAudio : startAudio,
+    compare : compare
   }
 
 })();

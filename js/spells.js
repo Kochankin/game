@@ -6,10 +6,9 @@
     return JSON.parse(value);
   }
 
-  // DRAG-n-DROP (no text is inserted into droppable element)
-  function dragAndDrop(draggable, droppable){
-    const pairs = {};
-    $( function() {
+  // DRAG-n-DROP 
+  function dragAndDrop(func, result, draggable, droppable){
+    $(function() {
     $(draggable).draggable({
       containment: ".task-window", 
       scroll: false,
@@ -29,50 +28,10 @@
       classes: {
         "ui-droppable-hover": "hover"
       },
-      drop: function( event, ui ) {
-        pairs[$(".active").text()] = $(this).text() ;
-        $(".active").remove();
-        $(this)
-          .addClass( "highlight" )
-        }
+      drop: func
       });
     });
-    return pairs;
-  }
-
-  // DRAG-n-DROP (text is inserted into droppable element)
-  function dragAndDropFillText(draggable, droppable){
-    const word = [];
-    $( function() {
-    $(draggable).draggable({
-      containment: ".task-window", 
-      scroll: false,
-      revert: "invalid",
-      start: function() {
-        $(this).css("background-color","white");
-        $(this).css("border","1px solid lightgrey");
-        $(this).addClass("active");
-    },
-    stop: function() {
-      $(this).css("background-color","lightgrey");
-      $(this).removeClass("active");
-    }
-    });
-    $(droppable).droppable({
-      accept: draggable,
-      classes: {
-        "ui-droppable-hover": "hover"
-      },
-      drop: function( event, ui ) {
-       this.textContent = $(".active").text();
-       word.push($(".active").text());
-        $(".active").remove();
-        $(this)
-          .addClass( "highlight" )
-        }
-      });
-    });
-    return word;
+    return result;
   }
 
   // For drag and drop
@@ -83,6 +42,19 @@
     });
     return condition[0];
   }
+
+  function getPairs(pairs, that) {
+    pairs[$(".active").text()] = that.textContent ;
+    $(".active").remove();
+    $(this).addClass( "highlight");
+  }
+
+  function getWord(word, that){
+    that.textContent = $(".active").text();
+    word.push($(".active").text());
+    $(".active").remove();
+    $(this).addClass( "highlight");
+   }
 
     // Spells-click handlers
     const spellHandlers = {
@@ -102,15 +74,13 @@
     taskWindow.addEventListener('click', onCloseButtonClick);
 
     function onSpellClick(event) {
-      if (event.target.tagName === 'DIV' || event.target.tagName === 'SPAN') {
-          setTimeout(function(){
+      if (event.target.tagName === 'DIV' || event.target.tagName === 'SPAN') {  
           taskWindow.style.display = 'block';
           document.querySelector('.main-audio').pause();
-          document.querySelector('.spells-board').classList.add('no-click');
-          if (!_.includes(event.target.classList, 'freeze-spell') || parse(localStorage.level) ===4) { 
-              document.querySelector('.battle-audio').play();
-          }
-          }, 300);
+          window.utils.hide(window.spells.spellsBoard);
+          if (!_.includes(event.target.classList, 'freeze-spell') || parse(localStorage.level) === 4) { 
+              document.querySelector('.battle-audio').play(); 
+          }     
       }
       _.forEach(spellHandlers, function(func, spell) {
         if (event.target.classList.contains(spell) ) {func();} // call the appropriate func
@@ -120,12 +90,9 @@
     // Close button of task
     function onCloseButtonClick(event){
         if (event.target.classList.contains('close-button')){
-            taskWindow.style.display = 'none';
-            taskWrapper.removeChild(taskWrapper.lastChild);
-            document.querySelector('.spells-board').classList.remove('no-click');
-            document.querySelector('.battle-audio').pause();
-            document.querySelector('.battle-audio').currentTime = 0;
-            document.querySelector('.main-audio').play();
+           taskWrapper.removeChild(taskWrapper.lastChild);  
+          window.utils.restore();     
+          document.querySelector('.main-audio').play();
         }
     }
 
@@ -135,13 +102,13 @@
     let task;
     switch (parse(localStorage.level)) {
     case 1:
-    task = _.random(1, 10) + _.sample(window.tasks.mathOperations.simple) + _.random(1, 10);
+      task = _.random(1, 10) + _.sample(window.tasks.mathOperations.simple) + _.random(1, 10);
       break;
     case 2:
-    task = _.random(1, 10) + _.sample(window.tasks.mathOperations.difficult) + _.random(1, 10);
+      task = _.random(1, 10) + _.sample(window.tasks.mathOperations.difficult) + _.random(1, 10);
       break;
     case 3:
-    task = "(" + _.random(1, 10) + _.sample(window.tasks.mathOperations.simple) + _.random(1, 10) + ")" + _.sample(window.tasks.mathOperations.difficult) + _.random(1, 10);
+      task = "(" + _.random(1, 10) + _.sample(window.tasks.mathOperations.simple) + _.random(1, 10) + ")" + _.sample(window.tasks.mathOperations.difficult) + _.random(1, 10);
       break;
     }
     exercise.textContent = task;
@@ -184,22 +151,19 @@
       storage.push(taskHeading, wrapper, submitButton, warning);
       storage.forEach(function(el){taskDiv.appendChild(el);});
       window.utils.addDocumentFragment(taskDiv, taskWrapper);
+
       const mathTask = generateMathTask(exercise);
-    
       submitButton.addEventListener('click', checkAnswer);
-      function checkAnswer(event){
-        let win;
-        warning.textContent = "";
-        if (input1.value === "" || input2.value === "") { 
-        warning.textContent = 'Заполни пустые поля!'; 
-        } else if (isNaN(Number(input1.value)) || isNaN(Number(input2.value))) {
-          warning.textContent = 'Ты должен ввести число!'; 
-        } else {
-          const condition = (eval(mathTask) === eval(Number(input1.value) + "/" + Number(input2.value)));
-          win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-          setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-          window.main.battleAnimation(win, currentTask);
-        }
+      function checkAnswer(event){    
+          warning.textContent = "";
+          if (input1.value === "" || input2.value === "") { 
+          warning.textContent = 'Заполни пустые поля!'; 
+          } else if (isNaN(Number(input1.value)) || isNaN(Number(input2.value))) {
+            warning.textContent = 'Ты должен ввести число!'; 
+          } else {
+            const condition = (eval(mathTask) === eval(Number(input1.value) + "/" + Number(input2.value)));
+            window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
+          }  
       }
     }   
   } 
@@ -259,14 +223,11 @@
     
       submitButton.addEventListener('click', checkAnswer);
       function checkAnswer(){
-        let win;
         if (input.value === "") { 
           warning.textContent = 'Заполни пустое поле'
         } else {
           const condition = (_.lowerCase(input.value)=== word);
-          win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-          setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-          window.main.battleAnimation(win, currentTask);
+          window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
         }
       }
     }
@@ -336,14 +297,11 @@
     
       submitButton.addEventListener('click', checkAnswer);
       function checkAnswer(){
-        let win;
         if (input.value === "") { 
           warning.textContent = 'Заполни пустое поле'
         } else {
           const condition = (_.lowerCase(input.value) === missedLetter);
-          win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-          setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-          window.main.battleAnimation(win, currentTask);
+          window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
         }
       }
     }
@@ -382,14 +340,11 @@
     
       submitButton.addEventListener('click', checkAnswer);
       function checkAnswer(){
-        let win;
         if (input.value === "") { 
           warning.textContent = 'Заполни пустое поле'
         } else {
-        const condition = (_.lowerCase(input.value) === capital);
-          win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-          setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-          window.main.battleAnimation(win, currentTask);
+          const condition = (_.lowerCase(input.value) === capital);
+          window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
         }
       }
     }
@@ -427,14 +382,11 @@
     
       submitButton.addEventListener('click', checkAnswer);
       function checkAnswer(){
-        let win;
         if (input.value === "") { 
           warning.textContent = 'Заполни пустое поле'
         } else {
-        const condition = (_.includes(translations, _.lowerCase(input.value)));
-          win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-          setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-          window.main.battleAnimation(win, currentTask);
+          const condition = (_.includes(translations, _.lowerCase(input.value)));
+          window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
         }
       }
     }
@@ -497,18 +449,16 @@
       storage.push(taskHeading, divWrapper,pWrapper, submitButton, warning);
       storage.forEach(function(el){taskDiv.appendChild(el);});
       window.utils.addDocumentFragment(taskDiv, taskWrapper);
-    
-      const pairs = dragAndDrop(".word", ".speechPart");
+      let pairs = {};
+      const dragNDropPairs = dragAndDrop.bind(null, function(){return getPairs(pairs, this)}, pairs);
+      pairs = dragNDropPairs(".word", ".speechPart");
       submitButton.addEventListener('click', checkAnswer);
       function checkAnswer(){
-        let win;
         if (pWrapper.firstChild) { 
           warning.textContent = 'Выполни задание'
         } else {
           const condition = checkPairs(pairs, window.tasks.speechPart);
-          win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-          setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-          window.main.battleAnimation(win, currentTask);
+          window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
         }
       }
     }
@@ -556,14 +506,11 @@
     const pairs = dragAndDrop(".word", ".lettersType");
     submitButton.addEventListener('click', checkAnswer);
     function checkAnswer(){
-      let win;
       if (pWrapper.firstChild) { 
         warning.textContent = 'Выполни задание'
       } else {
         const condition = checkPairs(pairs, window.tasks.alphabet);
-        win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-        setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-        window.main.battleAnimation(win, currentTask);
+        window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
       }
     }
   }
@@ -601,19 +548,18 @@
     storage.push(taskHeading, divWrapper, pWrapper, submitButton, warning);
     storage.forEach(function(el){taskDiv.appendChild(el);});
     window.utils.addDocumentFragment(taskDiv, taskWrapper);
-    const composedWordArr = dragAndDropFillText(".letter", ".cell-for-letter");
+    
+    let result = [];
+    const dragNDropText = dragAndDrop.bind(null, function(){return getWord(result, this)}, result);
+    result = dragNDropText(".letter", ".cell-for-letter");
     
     submitButton.addEventListener('click', checkAnswer);
     function checkAnswer(){
-      let win;
       if (pWrapper.firstChild) { 
         warning.textContent = 'Выполни задание'
       } else {
-        const composedWord = composedWordArr.reduce(function(a, b) { return a + b;});
-        const condition = (composedWord === solution);
-        win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-        setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-        window.main.battleAnimation(win, currentTask);
+        const condition = (result.join('') === solution);
+        window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
       }
     }
   }
@@ -656,19 +602,18 @@
     storage.forEach(function(el){taskDiv.appendChild(el);});
     window.utils.addDocumentFragment(taskDiv, taskWrapper);
     document.querySelector('.pic').style.backgroundImage = "url('img/" + solution + ".png')";
-    const pair = dragAndDropFillText(".word", ".solution-box");
+    let pair = [];
+    const dragNDropText = dragAndDrop.bind(null, function(){return getWord(pair, this)}, pair);
+    pair = dragNDropText(".word", ".solution-box");
     
     submitButton.addEventListener('click', checkAnswer);
     function checkAnswer(){
-      let win;
       if (!divWrapper.textContent) { 
         warning.textContent = 'Выполни задание';
       } else {
         const answer = pair[pair.length-1];
         const condition = (answer === solution);
-        win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-        setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-        window.main.battleAnimation(win, currentTask);
+        window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
       }
     }
   }
@@ -701,7 +646,6 @@
     
     submitButton.addEventListener('click', checkAnswer);
     function checkAnswer(){
-      let win;
       if (input.value === "") { 
         warning.textContent = 'Заполни пустое поле'
       } else {
@@ -709,11 +653,8 @@
           index = (index === 11) ? -1 : index;
           return _.lowerCase(input.value) === window.tasks.months[index+1];
         }
-
         const condition = check();
-        win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-        setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-        window.main.battleAnimation(win, currentTask);
+        window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
       }
     }
   } 
@@ -763,14 +704,11 @@
   
   submitButton.addEventListener('click', checkAnswer);
   function checkAnswer(){
-    let win;
     if (!answer) { 
      warning.textContent = 'Выполни задание'
     } else {
       const condition = (answer === solution);
-      win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-      setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-      window.main.battleAnimation(win, currentTask);
+      window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
     }
   }
 }
@@ -832,18 +770,15 @@ function sentencePartsHandler() {
   function checkAnswer(){
   _.forEach(pWrapper.querySelectorAll('.subject'), function(item){subject.push(_.trim(item.textContent));})
   _.forEach(pWrapper.querySelectorAll('.predicate'), function(item){predicate.push(_.trim(item.textContent));})
-    let win;
     if (!predicate.length) { 
      warning.textContent = 'Выполни задание'
     } else {
       const condition = (_.isEqual(subject, pickedObj.subject)  && _.isEqual(predicate, pickedObj.predicate));
-      win =  window.main.isCorrect(condition, taskDiv, taskWrapper);
-      setTimeout(function(){window.utils.hideTaskWindow();}, 1500);
-      window.main.battleAnimation(win, currentTask);
+      window.main.isCorrect(condition, taskDiv, taskWrapper, currentTask);
     }
   }
 }
     window.spells = {
-      spellsBoard : spellsBoard,
+      spellsBoard : spellsBoard
     }   
   })();

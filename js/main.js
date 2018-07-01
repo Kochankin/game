@@ -15,16 +15,19 @@
     // if this is the first game
     if (!localStorage.length) {
       localStorage.setItem('level', '1');   
-      localStorage.setItem('results', '{}');
+      localStorage.setItem('results', '{}'); 
+      localStorage.setItem('gameWin', 'null');
     }
     // if this is the first level
     if (parse(localStorage.level) === 1){
       localStorage.setItem('killedMonsters', '0');
       localStorage.setItem('userName', 'User');
+      
     }
    // update in any case
     localStorage.setItem('userHealth', '100'); 
     localStorage.setItem('monsterHealth', '100');
+    localStorage.setItem('levelWin', 'null');
   }
 
 
@@ -67,39 +70,33 @@ function saveUserName(){
 
 // Call after win or "new game"-button click
 function initLevel(){
-  document.addEventListener('click', function(){
-    window.utils.soundEffect('.click-audio');
-  });
-
-  document.querySelector('.user-board>.name').textContent = localStorage.length ? localStorage.userName.substring(1, localStorage.userName.length-1) : "User";
-
+  window.utils.restore();
   initLocalStorage();
-  document.addEventListener('load', window.utils.startAudio);
 
+  //audio
+  document.addEventListener('load', window.utils.startAudio);
   if (parse(localStorage.level) === 1){
     renderUserNameRequest();
-    document.querySelector('.main-audio').currentTime = 0;
     document.addEventListener('change',  window.utils.startAudio);
   }   
 
   window.animation.initKaty();
 
-  const context = document.getElementById("monster").getContext("2d");
-  context.clearRect(0, 0, 300, 300);
-  
   // generate monster name
   const monsterNameDiv = document.querySelector('.monster-board>.name');
   monsterNameDiv.textContent =  window.monsters.getMonsterName(window.monsters.monsterNames);
   // generate a monster appearance
-   window.monsters.generateMonster();
+  document.getElementById("monster").getContext("2d").clearRect(0, 0, 300, 300);
+  window.monsters.generateMonster();
 
-  // update health
- document.querySelector('.user-board .health>span').textContent = parse(localStorage.userHealth);
- document.querySelector('.monster-board .health>span').textContent = parse(localStorage.monsterHealth);
- document.querySelector('.user-board .health>div').style.width = "100%";
- document.querySelector('.monster-board .health>div').style.width = "100%";
+    // update health
+  document.querySelector('.user-board .health>span').textContent = parse(localStorage.userHealth);
+  document.querySelector('.monster-board .health>span').textContent = parse(localStorage.monsterHealth);
+  document.querySelector('.user-board .health>div').style.width = "100%";
+  document.querySelector('.monster-board .health>div').style.width = "100%";
 
-  // show level
+  // show user name and level
+  document.querySelector('.user-board>.name').textContent = localStorage.length ? localStorage.userName.substring(1, localStorage.userName.length-1) : "User";
   document.querySelector('.level>span').textContent = parse(localStorage.level);
 
   // set background-image
@@ -110,16 +107,16 @@ function initLevel(){
 initLevel();
 
 // Check solution correctness (for 1 task)
-function isCorrect(condition, taskDiv, taskWrapper){
+function isCorrect(condition, taskDiv, taskWrapper, currentTask){
+  let win;
   const message = window.utils.createEl('p');
   message.classList.add('results-message');
-  let win;
   if (condition) { 
     localStorage.monsterHealth = parse(localStorage.monsterHealth) - 20;
     window.utils.hide(taskDiv);
     taskWrapper.removeChild(taskWrapper.lastChild);
     message.textContent = 'ВЕРНО!';
-    setTimeout(function(){window.utils.soundEffect('.correct-audio');}, 100);
+    window.utils.soundEffect('.correct-audio');
     win = true;
   } else {
     if (parse(localStorage.userHealth) > 0) {
@@ -131,44 +128,44 @@ function isCorrect(condition, taskDiv, taskWrapper){
     }
     window.utils.hide(taskDiv);
     message.textContent = 'ТЫ ОШИБСЯ!';
-    setTimeout(function(){window.utils.soundEffect('.wrong-audio');}, 80);
+    window.utils.soundEffect('.wrong-audio');
     win = false;
   }  
-  taskWrapper.appendChild(message);  
+  let promise = new Promise((resolve) => {
+    taskWrapper.appendChild(message);
+    setTimeout(() => {resolve();}, 1500);
+  });
+  promise.then(() => {
+    window.utils.hideTaskWindow();
+    window.main.battleAnimation(win, currentTask);
+  })   
   return win;
 }
 
 // CHECK PLAYER STATUS (is the game over?)
 function checkState() {
   const monsterCanvas = document.querySelector('#monster');
-  let win;
-  // if user or monster was killed
   if (!parse(localStorage.userHealth) || !parse(localStorage.monsterHealth)){ 
-    if (parse(localStorage.userHealth) === 0){ 
-      win = false;
-      window.animation.canvasKatyImage.addEventListener("load", window.animation.animateDead);
-      window.animation.canvasKatyImage.src = "img/dead.png";   
-      localStorage.setItem('level', "1");
-      window.utils.soundEffect('.scream-audio');
-    } else if (parse(localStorage.monsterHealth) === 0) { 
-      win = true;
+    if (!parse(localStorage.userHealth)){ // Level loose
+      localStorage.levelWin = "loose";
+      localStorage.gameWin = "loose";
+      let promise = new Promise((resolve) => {
+        window.animation.initDead();
+        window.utils.soundEffect('.scream-audio');
+        setTimeout(() => {resolve();}, 1000);
+      });
+      promise.then(() => showNotice()); 
+    } else if (!parse(localStorage.monsterHealth)) { //Level win
+      localStorage.levelWin = "win";
       monsterCanvas.style.animationName = 'animateMonsterDeath';
       monsterCanvas.style.animationIterationCount = '1';
-      setTimeout(function() {window.utils.soundEffect('.fall-audio');}, 500);
-       
-      setTimeout(function(){
-        const context = document.getElementById("monster").getContext("2d");
-        context.clearRect(0, 0, 300, 300);
-      }, 1000);
+      monsterCanvas.addEventListener('animationstart', monsterFall);
 
       // update level
       let level = parse(localStorage.level);
-      if (level === 4) {   
-        level = 1;
-      } else {
-        ++level;
-      }
+      ++level;
       localStorage.setItem('level', stringify(level));
+      localStorage.gameWin = (level > 4 ) ? 'win' : null;
 
       // update killed monsters count
       let killedMonsters = parse(localStorage.killedMonsters);
@@ -180,59 +177,67 @@ function checkState() {
     const results = parse(localStorage.results);
     results[parse(localStorage.userName)] = parse(localStorage.killedMonsters);
     localStorage.results = stringify(results);
-
-    setTimeout(function(){showNotice(win);}, 1500); // show notice
-    setTimeout(hideNotice, 3500); // window.utils.hide notice
-    setTimeout(showSpinner, 3500); // show spinner
-    setTimeout(hideSpinner, 5000); // window.utils.hide spinner
-    if (win && parse(localStorage.level) !=1) { 
-      setTimeout(function(){
-        initLevel();
-      },  5000);// load next level
-      document.querySelector('.main-audio').play();
-      document.querySelector('.spells-board').classList.remove('no-click');
-    } else {
-      setTimeout(showResultsTable,  5000); // show results
-    }
-  // if user or monster are alive
-  } else {
-    document.querySelector('.main-audio').play();
     document.querySelector('.spells-board').classList.remove('no-click');
-  }
+  } else { window.utils.restore();}
+}
+
+function monsterFall(){
+  const monsterCanvas = document.querySelector('#monster');
+  monsterCanvas.addEventListener('animationend', monsterDisappear);
+  let promise = new Promise((resolve) => {
+    setTimeout(() => {resolve();}, 500);
+  });
+  promise.then(() => window.utils.soundEffect('.fall-audio'));
+  monsterCanvas.removeEventListener ('animationstart', monsterFall);
+}
+
+function monsterDisappear(){
+  const monsterCanvas = document.querySelector('#monster');
+  const context = document.getElementById("monster").getContext("2d");
+  context.clearRect(0, 0, 300, 300);
+  showNotice();
+  monsterCanvas.removeEventListener('animationend', monsterDisappear);
 }
 
 // Notice on loose or win
-function showNotice(win) {
+function showNotice() {
   const notice = window.utils.createEl('section');
   notice.classList.add('notice');
   document.querySelector('.container').after(notice);
-  if (win){ 
-    notice.textContent = parse(localStorage.level) === 1 ? "ТЫ ВЫИГРАЛ!" : "УРОВЕНЬ ПРОЙДЕН!";
+  if (localStorage.levelWin === "win"){ 
+    notice.textContent = localStorage.gameWin === "win" ? "ТЫ ВЫИГРАЛ!" : "УРОВЕНЬ ПРОЙДЕН!";
     window.utils.soundEffect('.game-win-audio');
-  } else{
+  } else {
     notice.textContent = "ТЫ ПРОИГРАЛ!";
     window.utils.soundEffect('.game-lose-audio');
   }
-}
-
-function hideNotice(){
-  document.querySelector('body').removeChild(document.querySelector('.notice'));
+  let promise = new Promise((resolve) => {
+    setTimeout(() => {resolve();}, 2000);
+  });
+  promise.then(function(){
+    document.querySelector('body').removeChild(notice);
+    let func = (localStorage.gameWin == "null") ? initLevel : showResultsTable;
+    showSpinner(func);
+  }); 
 }
 
 // Spinner for loading imitation
-function showSpinner() {
+function showSpinner(func) {
   const page = window.utils.createEl('section');
   const spinner = window.utils.createEl('div');
   page.classList.add('load-page');
   spinner.classList.add('spinner');
   page.appendChild(spinner);
   document.querySelector('.container').after(page);
+  let promise = new Promise((resolve) => {
+    setTimeout(() => {resolve();}, 1500);
+  });
+  promise.then(function() {
+    document.querySelector('body').removeChild(page);
+    func();
+  }
+   );
 }
-
-function hideSpinner() {
-  document.querySelector('body').removeChild(document.querySelector('.load-page'));
-}
-
 
 // RESULTS TABLE - TOP 5 results are only shown
 function showResultsTable(){ 
@@ -243,46 +248,24 @@ function showResultsTable(){
   resultsPage.classList.add('results-page');
   heading.textContent = "ТОП-5";
   button.textContent = "Новая игра";
+  localStorage.gameWin = null;
+  localStorage.levelWin = null;
+  localStorage.level = 1;
   button.addEventListener('click', function(){
     document.querySelector('body').removeChild(resultsPage); 
-    showSpinner(); // show spinner
-    initLevel();
-    setTimeout(function(){
-      document.querySelector('.results-audio').pause();
-      document.querySelector('.results-audio').currentTime = 0;
-      hideSpinner();// window.utils.hide spinner
-    }, 1500);});
-
-    const results = parse(localStorage.results);
-    const resultsArr= Object.entries(results);
-    const sorted = resultsArr.sort(compare);
-    let rows = sorted.length >= 5 ? 6 : sorted.length + 1;
-    for (let j = 0; j < rows; j++ ){
-      let tr = window.utils.createEl('tr');
-      if (j === 0)  { 
-        insertCells(tr, 'th');
-        tr.firstChild.textContent = "ИГРОК";
-        tr.lastChild.textContent = "Убитые монстры";
-      } else {
-        insertCells(tr, 'td'); 
-        
-        for (let i = 0; i < rows-1; i ++){
-          if (i === j - 1) {
-            tr.firstChild.textContent = sorted[i][0];
-            tr.lastChild.textContent = sorted[i][1]; 
-          }
-        }
-      }    
-      table.appendChild(tr);
-    }
-
+    showSpinner(initLevel);
+  });
+  
+  fillTable(table);
   resultsPage.appendChild(heading);
   resultsPage.appendChild(table);
   resultsPage.appendChild(button);
   document.querySelector('.container').after(resultsPage);  
-
-  document.querySelector('.main-audio').pause();
-  setTimeout(function(){ document.querySelector('.results-audio').play();}, 200);
+  let promise = new Promise((resolve) => {
+    document.querySelector('.main-audio').pause();
+    resolve();
+  });
+  promise.then(() => document.querySelector('.results-audio').play());
   document.querySelector('.spells-board').classList.remove('no-click');
 }
 
@@ -293,136 +276,128 @@ function insertCells(el, cell) {
   }
 }
 
-function compare (arrA, arrB) {
-  return arrB[1] - arrA[1];
+function fillTable(table){
+  const results = parse(localStorage.results);
+  const resultsArr = Object.entries(results); //transform to: [ ['katy', 2], ['max', 3] ]
+  const sorted = resultsArr.sort(window.utils.compare); // to get the best results
+  let rows = sorted.length >= 5 ? 6 : sorted.length + 1; // count number of table rows (6 or less)
+  for (let j = 0; j < rows; j++ ){
+    let tr = window.utils.createEl('tr');
+    if (j === 0)  { 
+      insertCells(tr, 'th');
+      tr.firstChild.textContent = "ИГРОК";
+      tr.lastChild.textContent = "Убитые монстры";
+    } else {
+      insertCells(tr, 'td'); 
+      
+      for (let i = 0; i < rows-1; i ++){
+        if (i === j - 1) {
+          tr.firstChild.textContent = sorted[i][0];
+          tr.lastChild.textContent = sorted[i][1]; 
+        }
+      }
+    }    
+    table.appendChild(tr);
+  }
 }
-
 
 // BATTLE ANIMATION
 function battleAnimation(win, currentTask){
-  const monsterCanvas = document.querySelector('#monster');
-  window.utils.hide (window.spells.spellsBoard);
-  setTimeout(animation, 1200);
-  function animation() {
+    const monsterCanvas = document.querySelector('#monster');
     if (win) { // -WIN-
-      // shoot
-      window.animation.initShoot();
-     
-      setTimeout( function(){
-        window.utils.soundEffect('.shoot-audio');
-        setTimeout(function(){window.utils.soundEffect('.explode-audio')}, 700);
-        setTimeout(function(){window.utils.soundEffect('.monster-scream-audio')}, 1500);
-      }, 700);
-      setTimeout(applySpell, 1000);
-      setTimeout(reduceMonsterHealth, 2700);
+      let promise = new Promise((resolve) => { //shoot
+        window.animation.initShoot();
+        setTimeout(() => {resolve();}, 700);
+      });
 
-      //apply spell
-        function applySpell() {
-          const spellImg = window.utils.createEl('div');
-          spellImg.classList.add('spell-img');
-          spellImg.classList.add(currentTask);
-          document.querySelector('#katy').after(spellImg);
-          setTimeout(explose, 700);
-
-          // explosion
-          function explose() { 
-            document.querySelector('.container').removeChild(spellImg);
-            const canvasExpl = window.utils.createEl('canvas');
-            canvasExpl.setAttribute('id', 'explosion');
-            monsterCanvas.after(canvasExpl);
-            canvasExpl.width = 100; 
-            canvasExpl.height = 98;
-            const canvasExplImage = new Image();	
-            const contextExpl = canvasExpl.getContext("2d");
-            canvasExplImage.src = "img/explosion.png"; 
-            canvasExplImage.addEventListener("load", animateExplosion);
-
-            const explosion = window.animation.sprite({
-              width: 1000, 
-              height: 98,
-              image: canvasExplImage,
-              numberOfFrames: 10, 
-              ticksPerFrame: 6, 
-            }, contextExpl);
-
-            function animateExplosion () {
-              window.requestAnimationFrame(animateExplosion);
-              explosion.motion();
-              explosion.render();
-            }
-            setTimeout( function() {document.querySelector('.container').removeChild(canvasExpl);}, 1000);
-          }       
-        }
-      
-        // reduce health
-        function reduceMonsterHealth() {
-          const healthDiv = document.querySelector('.monster-board .health>div');
-          let monsterHealth = parse(localStorage.monsterHealth);
-          healthDiv.style.width = monsterHealth + '%';
-          document.querySelector('.monster-board .health>span').textContent = monsterHealth;
-        }
-        
+      promise
+      .then(() => {window.utils.soundEffect('.shoot-audio')})
+      .then(() => {applySpell(currentTask)}) //spell
+      .then(() => {setTimeout(explose, 700)}); //explosion
+            
       } else { // -LOOSE-
-        // attack
-        monsterCanvas.style.animationName = 'attack';
+        monsterCanvas.style.animationName = 'attack';// attack
         monsterCanvas.style.animationIterationCount = '1';
-        setTimeout( function(){
-          window.utils.soundEffect('.moving-audio');
-          setTimeout(function(){window.utils.soundEffect('.fireball-audio')}, 1200);
-          setTimeout(function(){window.utils.soundEffect('.boom-audio')}, 1500);
-          setTimeout(function(){window.utils.soundEffect('.hurt-audio')}, 1800);
-        }, 100);
-        setTimeout(monsterSpell, 1000);
-        setTimeout(reduceUserHealth, 2700);
-
-        //apply spell
-        function monsterSpell() {
-          const monsterSmoke = window.utils.createEl('div');
-          monsterSmoke.classList.add('monster-smoke');
-          document.querySelector('#katy').after(monsterSmoke);
-          setTimeout(smokeAnimation, 700);
-        }
-        
-        function smokeAnimation() { 
-          document.querySelector('.container').removeChild(document.querySelector('.monster-smoke'));
-          const canvasSmoke = window.utils.createEl('canvas');
-          canvasSmoke.setAttribute('id', 'smoke');
-          document.querySelector('.container').appendChild(canvasSmoke);
-          canvasSmoke.width = 267; 
-          canvasSmoke.height = 267;
-          const canvasSmokeImage = new Image();	
-          const contextSmoke = canvasSmoke.getContext("2d");
-          canvasSmokeImage.src = "img/smoke.png"; 
-          canvasSmokeImage.addEventListener("load", animateSmoke);
-
-          const smoke = window.animation.sprite({
-            width: 2670, 
-            height: 267,
-            image: canvasSmokeImage,
-            numberOfFrames: 10, 
-            ticksPerFrame: 6, 
-          }, contextSmoke);
-
-          function animateSmoke () {
-            window.requestAnimationFrame(animateSmoke);
-            smoke.motion();
-            smoke.render();
-          }
-          setTimeout( function() {document.querySelector('.container').removeChild(canvasSmoke);}, 1000);
-        }    
-        // reduce health
-        function reduceUserHealth() {
-          const healthDiv = document.querySelector('.user-board .health>div');
-          let userHealth = parse(localStorage.userHealth);
-          healthDiv.style.width = userHealth + '%';
-          document.querySelector('.user-board .health>span').textContent = userHealth;
-        }
- 
+        monsterCanvas.addEventListener('animationstart', monsterMove);
+        monsterCanvas.addEventListener('animationend', monsterSpell);     
       }  
-      setTimeout(window.utils.restore, 3000);
-      setTimeout(checkState, 3500);
-  }  
 }
+
+function applySpell(currentTask) {
+  const spellImg = window.utils.createEl('div');
+  spellImg.classList.add('spell-img');
+  spellImg.classList.add(currentTask);
+  document.querySelector('#katy').after(spellImg);
+}
+
+function explose() { 
+  const spellImg = document.querySelector('.spell-img');
+  document.querySelector('.container').removeChild(spellImg);
+  const canvasExpl = window.utils.createEl('canvas');
+  canvasExpl.setAttribute('id', 'explosion');
+  document.querySelector('#monster').after(canvasExpl);
+  
+  let promise = new Promise((resolve) => {
+    window.animation.initExplosion();
+    window.utils.soundEffect('.explode-audio')
+    setTimeout(() => {resolve();}, 1000);
+  });
+  promise
+  .then(() => {document.querySelector('.container').removeChild(canvasExpl)})
+  .then(() => {window.utils.soundEffect('.monster-scream-audio')})
+  .then(() => {setTimeout(reduceMonsterHealth, 1000)})
+  .then(() => {checkState()});
+}  
+
+  function reduceMonsterHealth() {
+    const healthDiv = document.querySelector('.monster-board .health>div');
+    let monsterHealth = parse(localStorage.monsterHealth);
+    healthDiv.style.width = monsterHealth + '%';
+    document.querySelector('.monster-board .health>span').textContent = monsterHealth;
+  }
+
+  function monsterMove(){
+    const monsterCanvas = document.querySelector('#monster');
+    window.utils.soundEffect('.moving-audio');
+    monsterCanvas.removeEventListener('animationstart', monsterMove);
+  }
+
+  function monsterSpell() {
+    const monsterCanvas = document.querySelector('#monster');
+    const monsterSmoke = window.utils.createEl('div');
+    monsterSmoke.classList.add('monster-smoke');
+    document.querySelector('#katy').after(monsterSmoke);
+    let promise = new Promise((resolve) => {
+      setTimeout(() => {resolve();}, 700);
+    });
+    promise.then(() => {smoke()});
+    monsterCanvas.removeEventListener('animationend', monsterSpell);
+  }
+
+  function smoke() { 
+    document.querySelector('.container').removeChild(document.querySelector('.monster-smoke'));
+    const canvasSmoke = window.utils.createEl('canvas');
+    canvasSmoke.setAttribute('id', 'smoke');
+    document.querySelector('.container').appendChild(canvasSmoke);
+    let promise = new Promise((resolve) => {
+      window.animation.initSmoke();
+      window.utils.soundEffect('.fireball-audio');
+      window.utils.soundEffect('.hurt-audio');   
+      setTimeout(() => {resolve();}, 1000);
+    });
+    promise
+    .then(() => {document.querySelector('.container').removeChild(canvasSmoke)})
+    .then(() => {reduceUserHealth()})
+    .then(() => {checkState()});
+  }  
+
+  // reduce health
+  function reduceUserHealth() {
+    const healthDiv = document.querySelector('.user-board .health>div');
+    let userHealth = parse(localStorage.userHealth);
+    healthDiv.style.width = userHealth + '%';
+    document.querySelector('.user-board .health>span').textContent = userHealth;
+  }
 
 window.main = {
   saveUserName : saveUserName,
@@ -431,5 +406,7 @@ window.main = {
 }
 
 })();
+
+
 
 
