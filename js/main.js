@@ -21,8 +21,7 @@
     // if this is the first level
     if (parse(localStorage.level) === 1){
       localStorage.setItem('killedMonsters', '0');
-      localStorage.setItem('userName', 'User');
-      
+      localStorage.setItem('userName', 'User');   
     }
    // update in any case
     localStorage.setItem('userHealth', '100'); 
@@ -109,6 +108,7 @@ initLevel();
 // Check solution correctness (for 1 task)
 function isCorrect(condition, taskDiv, taskWrapper, currentTask){
   let win;
+  const hideTaskWindowTimeout =  1500;
   const message = window.utils.createEl('p');
   message.classList.add('results-message');
   if (condition) { 
@@ -133,7 +133,7 @@ function isCorrect(condition, taskDiv, taskWrapper, currentTask){
   }  
   let promise = new Promise((resolve) => {
     taskWrapper.appendChild(message);
-    setTimeout(() => {resolve();}, 1500);
+    setTimeout(() => {resolve();}, hideTaskWindowTimeout);
   });
   promise.then(() => {
     window.utils.hideTaskWindow();
@@ -145,6 +145,7 @@ function isCorrect(condition, taskDiv, taskWrapper, currentTask){
 // CHECK PLAYER STATUS (is the game over?)
 function checkState() {
   const monsterCanvas = document.querySelector('#monster');
+  const showNoticeTimeout = 1000;
   if (!parse(localStorage.userHealth) || !parse(localStorage.monsterHealth)){ 
     if (!parse(localStorage.userHealth)){ // Level loose
       localStorage.levelWin = "loose";
@@ -152,7 +153,7 @@ function checkState() {
       let promise = new Promise((resolve) => {
         window.animation.initDead();
         window.utils.soundEffect('.scream-audio');
-        setTimeout(() => {resolve();}, 1000);
+        setTimeout(() => {resolve();}, showNoticeTimeout);
       });
       promise.then(() => showNotice()); 
     } else if (!parse(localStorage.monsterHealth)) { //Level win
@@ -183,9 +184,10 @@ function checkState() {
 
 function monsterFall(){
   const monsterCanvas = document.querySelector('#monster');
+  const fallSoundTimeout = 500;
   monsterCanvas.addEventListener('animationend', monsterDisappear);
   let promise = new Promise((resolve) => {
-    setTimeout(() => {resolve();}, 500);
+    setTimeout(() => {resolve();}, fallSoundTimeout);
   });
   promise.then(() => window.utils.soundEffect('.fall-audio'));
   monsterCanvas.removeEventListener ('animationstart', monsterFall);
@@ -202,6 +204,7 @@ function monsterDisappear(){
 // Notice on loose or win
 function showNotice() {
   const notice = window.utils.createEl('section');
+  const removeNoticeTimeout = 2000;
   notice.classList.add('notice');
   document.querySelector('.container').after(notice);
   if (localStorage.levelWin === "win"){ 
@@ -212,7 +215,7 @@ function showNotice() {
     window.utils.soundEffect('.game-lose-audio');
   }
   let promise = new Promise((resolve) => {
-    setTimeout(() => {resolve();}, 2000);
+    setTimeout(() => {resolve();}, removeNoticeTimeout);
   });
   promise.then(function(){
     document.querySelector('body').removeChild(notice);
@@ -225,12 +228,13 @@ function showNotice() {
 function showSpinner(func) {
   const page = window.utils.createEl('section');
   const spinner = window.utils.createEl('div');
+  const removeSpinnerTimeout = 1500;
   page.classList.add('load-page');
   spinner.classList.add('spinner');
   page.appendChild(spinner);
   document.querySelector('.container').after(page);
   let promise = new Promise((resolve) => {
-    setTimeout(() => {resolve();}, 1500);
+    setTimeout(() => {resolve();}, removeSpinnerTimeout);
   });
   promise.then(function() {
     document.querySelector('body').removeChild(page);
@@ -304,16 +308,18 @@ function fillTable(table){
 // BATTLE ANIMATION
 function battleAnimation(win, currentTask){
     const monsterCanvas = document.querySelector('#monster');
+    const shootSoundTimeout = 700;
+    const exploseTimeout = 700;
     if (win) { // -WIN-
       let promise = new Promise((resolve) => { //shoot
         window.animation.initShoot();
-        setTimeout(() => {resolve();}, 700);
+        setTimeout(() => {resolve();}, shootSoundTimeout);
       });
 
       promise
       .then(() => {window.utils.soundEffect('.shoot-audio')})
       .then(() => {applySpell(currentTask)}) //spell
-      .then(() => {setTimeout(explose, 700)}); //explosion
+      .then(() => {setTimeout(explose, exploseTimeout)}); //explosion
             
       } else { // -LOOSE-
         monsterCanvas.style.animationName = 'attack';// attack
@@ -331,6 +337,8 @@ function applySpell(currentTask) {
 }
 
 function explose() { 
+  const removeExploseTimeout = 1000;
+  const checkStateTimeout = 1000;
   const spellImg = document.querySelector('.spell-img');
   document.querySelector('.container').removeChild(spellImg);
   const canvasExpl = window.utils.createEl('canvas');
@@ -340,12 +348,12 @@ function explose() {
   let promise = new Promise((resolve) => {
     window.animation.initExplosion();
     window.utils.soundEffect('.explode-audio')
-    setTimeout(() => {resolve();}, 1000);
+    setTimeout(() => {resolve();}, removeExploseTimeout);
   });
   promise
   .then(() => {document.querySelector('.container').removeChild(canvasExpl)})
   .then(() => {window.utils.soundEffect('.monster-scream-audio')})
-  .then(() => {setTimeout(reduceMonsterHealth, 1000)})
+  .then(() => {setTimeout(reduceMonsterHealth, checkStateTimeout)})
   .then(() => {checkState()});
 }  
 
@@ -363,18 +371,20 @@ function explose() {
   }
 
   function monsterSpell() {
+    const smokeTimeout = 700;
     const monsterCanvas = document.querySelector('#monster');
     const monsterSmoke = window.utils.createEl('div');
     monsterSmoke.classList.add('monster-smoke');
     document.querySelector('#katy').after(monsterSmoke);
     let promise = new Promise((resolve) => {
-      setTimeout(() => {resolve();}, 700);
+      setTimeout(() => {resolve();}, smokeTimeout);
     });
     promise.then(() => {smoke()});
     monsterCanvas.removeEventListener('animationend', monsterSpell);
   }
 
   function smoke() { 
+    const removeSmokeTimeout = 1000;
     document.querySelector('.container').removeChild(document.querySelector('.monster-smoke'));
     const canvasSmoke = window.utils.createEl('canvas');
     canvasSmoke.setAttribute('id', 'smoke');
@@ -383,7 +393,7 @@ function explose() {
       window.animation.initSmoke();
       window.utils.soundEffect('.fireball-audio');
       window.utils.soundEffect('.hurt-audio');   
-      setTimeout(() => {resolve();}, 1000);
+      setTimeout(() => {resolve();}, removeSmokeTimeout);
     });
     promise
     .then(() => {document.querySelector('.container').removeChild(canvasSmoke)})

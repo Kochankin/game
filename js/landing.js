@@ -1,10 +1,16 @@
+const scrollTime = 1500;
+const scrollHeight = 100;
+const resizeWidth = 720;
+const hideMenuHeight = 400;
+const timeToRemoveClass = 400;
+
 // For scrolling up a page on menu clicking 
 $(document).ready(function(){
 	$("#menu").on("click","a", function (event) {
 		event.preventDefault();
 		const id  = $(this).attr('href'),
 			  top = $(id).offset().top;
-		$('body,html').animate({scrollTop: top}, 1500);
+		$('body,html').animate({scrollTop: top}, scrollTime);
 	});
 });
 
@@ -12,9 +18,9 @@ $(document).ready(function(){
 window.onscroll = function() {
 	const scrollArrow = document.querySelector('.scroll-arrow');
 	scrollArrow.onclick = function() {
-        $('body,html').animate({scrollTop: 0}, 1500);
+        $('body,html').animate({scrollTop: 0}, scrollTime);
 	}
-	if (window.scrollY >= 100) {
+	if (window.scrollY >= scrollHeight) {
 		scrollArrow.classList.add("scroll-up");
 	} else {
 		scrollArrow.classList.remove("scroll-up");
@@ -23,7 +29,7 @@ window.onscroll = function() {
 
 // Hide menu if it is opened and window is resized
 window.onresize = function() {
-	if (window.innerWidth < 720 && !document.querySelector('#menu').classList.contains('open')){
+	if (window.innerWidth < resizeWidth && !document.querySelector('#menu').classList.contains('open')){
 		$("#menu").slideUp();
 		document.querySelector('#menu').style.display = "none";
 		document.querySelector('#menu').classList.remove('open');	
@@ -38,11 +44,13 @@ window.onresize = function() {
 //Hide menu
 function hideMenu() {
 	const cross = document.querySelector('.fa-times');
-	if (cross) {cross.parentElement.removeChild(cross);}
-	setTimeout(function(){
-		document.querySelector('#menu').classList.remove('open');
-	}, 400);
-	
+	const promise = new Promise((resolve) => {
+	if (cross) {
+		cross.parentElement.removeChild(cross);
+		setTimeout(() => {resolve();}, timeToRemoveClass);
+	}	
+  });
+  promise.then(() => document.querySelector('#menu').classList.remove('open'));
 }
 
 // Slide top menu
@@ -53,10 +61,10 @@ function openMenu(){
     cross.classList.add('fas');
     cross.classList.add('fa-times');
 	ul.after(cross);
-	$("ul").slideDown(400);
+	$("ul").slideDown(hideMenuHeight);
 	ul.classList.add('open');
     cross.addEventListener('click', function(){
-		$("ul").slideUp(400);
+		$("ul").slideUp(hideMenuHeight);
 		hideMenu();
 	} );
 }

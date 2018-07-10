@@ -44,7 +44,7 @@
   }
 
   function getPairs(pairs, that) {
-    pairs[$(".active").text()] = that.textContent ;
+    pairs[$(".active").text()] = that.textContent;
     $(".active").remove();
     $(this).addClass( "highlight");
   }
